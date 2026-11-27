@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DAADHI E-TECH, journal de recherche</title>
+<meta name="description" content="Journal de recherche public du projet DAADHI E-TECH : un patch passif pour comparer la température de la peau entre deux côtés du corps après l'effort.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Idée : un carnet de laboratoire public. L'axe du journal est une échelle de température, du froid (bleu-vert) au chaud (rouge-orangé), comme le virage de couleur du patch. */
+:root{
+  --bg:#f3f6f8; --card:#ffffff; --ink:#14232b; --muted:#53656f; --line:#d3dde3;
+  --cold:#1c7f9a; --warm:#d4472b; --accent:#d4472b;
+  --ok:#1f7a4d; --soon:#8a5a00;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1a20; --card:#17252d; --ink:#e8f0f3; --muted:#9db0ba; --line:#2b3d47;
+    --cold:#4cc0dc; --warm:#ff7a59; --accent:#ff7a59;
+    --ok:#5fd09a; --soon:#f2b84b; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1a20; --card:#17252d; --ink:#e8f0f3; --muted:#9db0ba; --line:#2b3d47;
+  --cold:#4cc0dc; --warm:#ff7a59; --accent:#ff7a59;
+  --ok:#5fd09a; --soon:#f2b84b; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.65}
+a{color:var(--cold)}
+.wrap{max-width:900px;margin:0 auto;padding:0 20px}
+header.top{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-top:12px;padding-bottom:12px}
+.brand{font-family:var(--display);font-weight:700;font-stretch:112%;letter-spacing:.02em;font-size:18px}
+.brand span{color:var(--accent)}
+nav{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:12.5px;align-items:center}
+nav a{color:var(--muted);text-decoration:none}
+nav a:hover,nav a:focus-visible{color:var(--ink);text-decoration:underline}
+.hero{padding:44px 0 26px}
+.tag{font-family:var(--mono);font-size:13px;color:var(--muted);margin:0 0 14px}
+h1{font-family:var(--display);font-stretch:108%;font-weight:750;font-size:clamp(30px,6vw,50px);line-height:1.1;margin:0 0 18px;text-wrap:balance;letter-spacing:-.01em}
+.lede{font-size:19px;max-width:64ch;margin:0 0 22px}
+.scale{height:10px;border-radius:6px;background:linear-gradient(90deg,var(--cold),#7bb8a0 35%,#e0b04a 60%,var(--warm));margin:26px 0 6px}
+.ticks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:26px 0 0}
+.fact{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.fact b{display:block;font-family:var(--display);font-stretch:110%;font-size:26px;line-height:1.15}
+.fact small{color:var(--muted);font-size:14px}
+section{padding:38px 0 4px}
+.eyebrow{font-family:var(--mono);font-size:12.5px;color:var(--accent);margin:0 0 6px}
+h2{font-family:var(--display);font-stretch:108%;font-weight:700;font-size:27px;margin:0 0 12px;text-wrap:balance;line-height:1.2}
+h3{font-family:var(--display);font-size:18px;margin:0 0 6px}
+p{margin:0 0 14px;max-width:70ch}
+.note{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--soon);border-radius:8px;padding:14px 16px;max-width:72ch}
+.note p:last-child{margin:0}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:6px 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+.card p{margin:0;font-size:15.5px;color:var(--muted)}
+.steps{counter-reset:s;list-style:none;margin:8px 0 14px;padding:0;display:grid;gap:12px}
+.steps li{counter-increment:s;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px 14px 56px;position:relative}
+.steps li::before{content:counter(s);position:absolute;left:14px;top:12px;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-size:14px}
+:root[data-theme="dark"] .steps li::before{color:#1a0d08}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .steps li::before{color:#1a0d08}}
+.steps b{display:block;font-family:var(--display)}
+.steps span{color:var(--muted);font-size:15.5px}
+.log{position:relative;margin:18px 0 0;padding-left:34px;list-style:none}
+.log::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:4px;border-radius:3px;background:linear-gradient(180deg,var(--warm),#e0b04a 40%,#7bb8a0 70%,var(--cold))}
+.log li{position:relative;margin:0 0 18px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.log li::before{content:"";position:absolute;left:-31px;top:18px;width:14px;height:14px;border-radius:50%;background:var(--card);border:3px solid var(--accent)}
+.date{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.log h3{margin:2px 0 4px}
+.log p{margin:0;font-size:15.5px}
+.pill{display:inline-block;font-family:var(--mono);font-size:12px;padding:1px 8px;border-radius:99px;border:1px solid currentColor;margin-left:6px;vertical-align:middle;white-space:nowrap}
+.pill.done{color:var(--ok)} .pill.soon{color:var(--soon)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:15.5px;background:var(--card);border:1px solid var(--line)}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:12.5px;font-weight:500;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-family:var(--mono);white-space:nowrap}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:0 0 10px}
+summary{cursor:pointer;font-family:var(--display);font-weight:600;font-size:17px}
+details p{margin:10px 0 0;font-size:16px}
+dl{margin:0;display:grid;grid-template-columns:minmax(120px,200px) 1fr;gap:8px 16px}
+dt{font-family:var(--mono);font-size:13.5px;color:var(--accent)}
+dd{margin:0;font-size:16px}
+@media (max-width:520px){dl{grid-template-columns:1fr}}
+footer{margin-top:46px;padding:26px 0 48px;border-top:1px solid var(--line);color:var(--muted);font-size:14.5px}
+footer p{max-width:76ch}
+button.theme{font-family:var(--mono);font-size:12.5px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:4px 12px;cursor:pointer}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--cold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{header.top{position:static}.theme{display:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">DAADHI <span>E-TECH</span></div>
+    <nav aria-label="Navigation">
+      <a href="#probleme">Problème</a>
+      <a href="#principe">Principe</a>
+      <a href="#journal">Journal</a>
+      <a href="#essais">Essais</a>
+      <a href="#etapes">Feuille de route</a>
+      <a href="#cadre">Cadre</a>
+      <a href="#faq">Questions</a>
+      <a href="#suivre">Contact</a>
+      <button class="theme" id="themeBtn" type="button" aria-label="Changer de thème">thème</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <p class="tag">Journal de recherche public · Université Paris Nanterre · PÉPITE PON</p>
+    <h1>Comparer la température de la peau, côté gauche contre côté droit, grâce à un patch passif.</h1>
+    <p class="lede">Je suis Ahmed Diallo, étudiant en première année de STAPS à l'Université Paris Nanterre. Je développe DAADHI E-TECH, un indicateur de température cutanée destiné aux sportifs. Ce site documente le projet au fur et à mesure : ce qui avance, ce qui échoue, et ce que je ne sais pas encore.</p>
+    <div class="scale" aria-hidden="true"></div>
+    <div class="ticks" aria-hidden="true"><span>28 °C</span><span>31</span><span>34</span><span>37</span><span>40 °C</span></div>
+    <div class="facts">
+      <div class="fact"><b>Laboratoire</b><small>stade actuel : choix et tests des matériaux</small></div>
+      <div class="fact"><b>73</b><small>sportifs interrogés dans l'enquête de départ</small></div>
+      <div class="fact"><b>0</b><small>essai sur une personne à ce jour</small></div>
+      <div class="fact"><b>2026–2027</b><small>année d'accompagnement PÉPITE PON</small></div>
+    </div>
+  </div>
+
+  <section id="probleme">
+    <p class="eyebrow">01 · Le besoin</p>
+    <h2>Après l'effort, la récupération se juge à la sensation</h2>
+    <p>Un sportif sait rarement si un muscle est plus sollicité que son équivalent de l'autre côté. Une différence de température entre deux zones symétriques du corps est un indicateur utilisé en thermographie sportive. Les outils qui la mesurent (caméras thermiques, sondes) sont coûteux, ponctuels, et demandent des conditions de mesure contrôlées.</p>
+    <p>Mon hypothèse : un repère simple, peu cher et lisible à l'œil nu peut aider les sportifs amateurs, les étudiants en STAPS et les préparateurs physiques à situer les zones qui chauffent, sans remplacer un avis médical.</p>
+  </section>
+
+  <section id="principe">
+    <p class="eyebrow">02 · Le principe</p>
+    <h2>Un patch qui change de couleur selon la température</h2>
+    <p>Le patch est <strong>passif</strong> : il n'a ni pile, ni électronique. Une couche sensible à la chaleur change de teinte autour de la température de la peau. On en pose un de chaque côté et on compare les deux couleurs.</p>
+    <ol class="steps">
+      <li><b>Poser</b><span>Un patch sur le muscle étudié, un autre sur le muscle symétrique de l'autre côté.</span></li>
+      <li><b>Attendre</b><span>La lecture se fait au repos, après un délai fixé à l'avance, dans une pièce à température stable.</span></li>
+      <li><b>Comparer</b><span>On regarde si les deux couleurs sont identiques ou différentes. Le repère est l'écart entre les deux côtés, pas une valeur isolée.</span></li>
+    </ol>
+    <div class="cols">
+      <div class="card"><h3>Simple</h3><p>Un coup d'œil, sans application obligatoire ni formation.</p></div>
+      <div class="card"><h3>Accessible</h3><p>L'objectif est un coût très inférieur à celui d'une caméra thermique.</p></div>
+      <div class="card"><h3>Adapté au corps</h3><p>Une gamme standard et des formes pensées pour les grands groupes musculaires sont à l'étude.</p></div>
+    </div>
+    <div class="note">
+      <p><strong>À retenir :</strong> DAADHI E-TECH est un repère de bien-être. Ce n'est pas un dispositif de diagnostic. L'absence de changement de couleur ne prouve pas l'absence de problème.</p>
+    </div>
+  </section>
+
+  <section id="journal">
+    <p class="eyebrow">03 · Journal de bord</p>
+    <h2>Ce qui a été fait, dans l'ordre</h2>
+    <p>Les entrées récentes sont en haut. Chaque étape est publiée quand elle est faite, avec ou sans bon résultat.</p>
+    <ol class="log" id="log"></ol>
+  </section>
+
+  <section id="essais">
+    <p class="eyebrow">04 · Méthode</p>
+    <h2>Un programme d'essais en sept étapes</h2>
+    <p>Je teste d'abord le matériau, puis le patch assemblé, puis la lecture par l'œil humain. Les seuils de réussite sont écrits avant chaque essai, jamais après. Je garde toutes les mesures, y compris les mauvaises.</p>
+    <div class="tw">
+    <table>
+      <thead><tr><th>Étape</th><th>Question posée</th><th>Statut</th></tr></thead>
+      <tbody id="tests"></tbody>
+    </table>
+    </div>
+    <h3 style="margin-top:22px">Résultats publiés</h3>
+    <div class="tw">
+    <table>
+      <thead><tr><th>Étape</th><th>Résultat</th><th>Date</th></tr></thead>
+      <tbody><tr><td>Aucun</td><td>Les premiers résultats seront publiés ici dès qu'ils existent, avec la méthode utilisée.</td><td>à venir</td></tr></tbody>
+    </table>
+    </div>
+  </section>
+
+  <section id="etapes">
+    <p class="eyebrow">05 · Feuille de route</p>
+    <h2>Des points d'arrêt prévus à l'avance</h2>
+    <p>Chaque point d'étape est une décision : continuer, corriger ou arrêter. Je préfère m'arrêter tôt que de défendre une idée que les mesures ne soutiennent pas.</p>
+    <div class="tw">
+    <table>
+      <thead><tr><th>Échéance</th><th>Ce qui doit être vrai pour continuer</th></tr></thead>
+      <tbody>
+        <tr><td>31 janv. 2027</td><td>Les composants sont qualifiés et les premiers essais de laboratoire sont lancés.</td></tr>
+        <tr><td>30 avr. 2027</td><td>Les essais sur le matériau et sur le patch assemblé donnent des résultats exploitables, et le besoin est confirmé par des entretiens.</td></tr>
+        <tr><td>Oct. 2027</td><td>Les essais de sécurité sont favorables et un essai pilote encadré peut être envisagé.</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <section id="cadre">
+    <p class="eyebrow">06 · Éthique et cadre</p>
+    <h2>Pas de test sur des personnes sans garanties</h2>
+    <dl>
+      <dt>Sécurité</dt><dd>Aucun patch n'est posé sur une personne avant des essais de biocompatibilité (norme ISO 10993) réalisés sur le patch fini, par un laboratoire compétent.</dd>
+      <dt>Recherche</dt><dd>Tout essai sur volontaires passe par l'université comme promoteur, selon le cadre applicable aux recherches impliquant la personne humaine, avec consentement écrit.</dd>
+      <dt>Données</dt><dd>Les données personnelles sont protégées selon le RGPD. Aucune donnée nominative n'est publiée sur ce site.</dd>
+      <dt>Réglementation</dt><dd>Le produit est pensé comme un indicateur de bien-être. Son statut au regard de la réglementation européenne sur les dispositifs médicaux sera vérifié avant toute mise sur le marché.</dd>
+      <dt>Propriété intellectuelle</dt><dd>Les formulations et la structure détaillée du patch ne sont pas publiées à ce stade. Une stratégie de protection est en préparation avec PÉPITE PON.</dd>
+    </dl>
+  </section>
+
+  <section id="limites">
+    <p class="eyebrow">07 · Limites</p>
+    <h2>Ce que je ne sais pas encore</h2>
+    <div class="note">
+      <p><strong>Le pari de 0,5 °C.</strong> Je vise la détection d'un écart de 0,5 °C entre deux côtés. Un fabricant de pigments m'a indiqué que ces pigments changent de couleur progressivement, sans seuil net, avec un retard entre chauffe et refroidissement. L'objectif est peut-être trop ambitieux. Les essais le diront, et je le publierai quelle que soit la réponse.</p>
+      <p><strong>La réutilisation.</strong> L'idée d'un élément réutilisable plusieurs fois est une hypothèse. Aucune mesure ne la confirme encore.</p>
+      <p><strong>La lecture sur le terrain.</strong> La peau chauffe aussi avec la température ambiante, la sueur ou les vêtements. Le protocole devra limiter ces biais.</p>
+    </div>
+  </section>
+
+  <section id="faq">
+    <p class="eyebrow">08 · Questions fréquentes</p>
+    <h2>Les questions qu'on me pose</h2>
+    <details><summary>C'est un produit à vendre ?</summary><p>Non, pas aujourd'hui. Le projet est en phase de recherche. Rien n'est commercialisé et aucune précommande n'est ouverte.</p></details>
+    <details><summary>Est-ce que ça diagnostique une blessure ?</summary><p>Non. C'est un repère de bien-être. Une douleur ou une gêne persistante relève d'un professionnel de santé.</p></details>
+    <details><summary>Pourquoi comparer gauche et droite ?</summary><p>La température de la peau varie d'une personne à l'autre et selon l'environnement. Comparer deux côtés du même corps, dans les mêmes conditions, réduit une grande partie de ces variations.</p></details>
+    <details><summary>Pourquoi ne pas utiliser une caméra thermique ?</summary><p>Elles sont efficaces mais chères, et demandent des conditions de mesure strictes. Le patch cherche à offrir un repère simple, sans remplacer une mesure professionnelle.</p></details>
+    <details><summary>Puis-je aider ou proposer un test ?</summary><p>Oui, avec plaisir. Voir la section Contact ci-dessous.</p></details>
+  </section>
+
+  <section id="suivre">
+    <p class="eyebrow">09 · Contact</p>
+    <h2>Suivre et contribuer</h2>
+    <p>Vous pratiquez un sport, la kinésithérapie, la chimie des matériaux ou l'électronique ? Un avis d'usage, une piste de matériau, un laboratoire prêt à relire un protocole : tout retour m'est utile.</p>
+    <p><strong>Contact :</strong> <span id="contact">à compléter</span></p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Projet étudiant porté dans le cadre du statut étudiant-entrepreneur (SNEE) de l'Université Paris Nanterre, avec l'accompagnement de PÉPITE PON. Cet indicateur n'est pas un dispositif médical et ne pose aucun diagnostic.</p>
+    <p>Dernière mise à jour : <span id="upd">26 novembre 2026</span></p>
+  </div>
+</footer>
+
+<script src="journal.js"></script>
+<script>
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+var log=document.getElementById("log");
+ENTRIES.forEach(function(e){
+  var li=el("li");
+  li.appendChild(el("div","date",e.date));
+  var h=el("h3",null,e.title);
+  h.appendChild(el("span","pill "+(e.statut==="fait"?"done":"soon"),e.statut));
+  li.appendChild(h);li.appendChild(el("p",null,e.text));log.appendChild(li);
+});
+var tb=document.getElementById("tests");
+TESTS.forEach(function(t){
+  var tr=el("tr");tr.appendChild(el("td",null,t[0]));tr.appendChild(el("td",null,t[1]));
+  var td=el("td");td.appendChild(el("span","pill soon",t[2]));tr.appendChild(td);tb.appendChild(tr);
+});
+document.getElementById("themeBtn").addEventListener("click",function(){
+  var r=document.documentElement,cur=r.getAttribute("data-theme");
+  var dark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;
+  r.setAttribute("data-theme",dark?"light":"dark");
+});
+document.getElementById("upd").textContent=SITE.updated;
+document.getElementById("contact").textContent=SITE.contact;
+</script>
+</body>
+</html>
