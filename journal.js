@@ -8,9 +8,10 @@
    ===================================================================== */
 var SITE={
   contact:"à compléter",
-  updated:"26 novembre 2026"
+  updated:"27 novembre 2026"
 };
 var ENTRIES=[
+ {date:"27 nov. 2026",title:"Mise en ligne du journal de recherche",text:"Ce site documente le projet DAADHI E-TECH au fil des étapes, résultats compris.",statut:"fait"},
  {date:"26 nov. 2026",title:"Premiers échantillons de silicone reçus",text:"Un fabricant de silicones médicaux m'a envoyé gratuitement un gel adhésif doux pour la peau et un primaire d'accroche. Prochaine étape : trouver un laboratoire pour les tester.",statut:"fait"},
  {date:"26 nov. 2026",title:"Rendez-vous avec la conseillère des projets avancés",text:"PÉPITE PON me met en relation avec une conseillère spécialisée et cherche un accès à un laboratoire et à du matériel. Elle m'a conseillé de documenter mon travail publiquement : c'est l'origine de ce site.",statut:"fait"},
  {date:"24–25 nov. 2026",title:"Demandes d'échantillons envoyées à plusieurs fournisseurs",text:"Films polyuréthane ultra-fins et pigments thermochromiques. Premiers retours : un fournisseur ne fabrique pas ce type de film, un autre impose une commande minimale de 5 kg, bien au-delà d'un essai de laboratoire. Je cherche de plus petites quantités.",statut:"fait"},
