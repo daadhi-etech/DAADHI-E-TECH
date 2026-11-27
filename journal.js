@@ -1,4 +1,4 @@
-{date:"27 nov. 2026",title:"Mise en ligne du journal de recherche",text:"Ce site documente le projet DAADHI E-TECH au fil des étapes, résultats compris.",statut:"fait"},/* =====================================================================
+/* =====================================================================
    JOURNAL DE BORD : c'est le seul fichier à modifier pour ajouter une étape.
    1. Copie une ligne { ... } du tableau ENTRIES.
    2. Colle-la EN HAUT de la liste (la plus récente en premier).
